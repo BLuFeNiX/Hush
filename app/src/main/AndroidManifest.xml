@@ -14,7 +14,7 @@
 
 
         <activity android:name=".SettingsActivity"
-            android:label="Hush! Settings">
+            android:label="Hush!">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER" />

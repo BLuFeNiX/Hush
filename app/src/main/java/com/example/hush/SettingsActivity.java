@@ -35,6 +35,20 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        SeekBar forgiveness = findViewById(R.id.seekbar_forgiveness);
+        forgiveness.setProgress(AppSettings.getForgiveness());
+        forgiveness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                AppSettings.setForgiveness(seekBar.getProgress());
+                Log.d(TAG, "forgiveness changed: "+seekBar.getProgress());
+            }
+        });
+
         findViewById(R.id.button_start).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

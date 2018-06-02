@@ -26,6 +26,15 @@ public class SoundMeterService extends Service {
 
     private RunningAverage avgAmp = new RunningAverage(6000);
 
+
+    /**
+     * how high the amplitude needs to be before we care
+     * should be from 0 to 32767
+     */
+    int threshold = 0;
+    int forgiveness = 0;
+    int hushCounter = 0;
+
     HandlerThread handlerThread = new HandlerThread(SoundMeterService.class.getSimpleName()+"-Thread");
     Handler handler;
     Runnable soundCheck = new Runnable() {
@@ -35,21 +44,18 @@ public class SoundMeterService extends Service {
             int avg = avgAmp.add(amp);
             int adjustedAmp = amp-avg;
 
-            Log.d(TAG, "avg: "+avg + ", amp: "+amp + ", diff: "+(amp-avg));
-
             if (adjustedAmp >= threshold) {
+                hushCounter++;
                 Log.d(TAG, "Hush!");
+            } else {
+                if (hushCounter > 0) hushCounter--;
             }
+
+            Log.d(TAG, "avg: "+avg + ", amp: "+amp + ", diff: "+(amp-avg) + " too loud? " + (hushCounter > forgiveness));
 
             handler.postDelayed(this, 100);
         }
     };
-
-    /**
-     * how high the amplitude needs to be before we care
-     * should be from 0 to 32767
-     */
-    int threshold = 0;
 
     @Nullable
     @Override
@@ -70,6 +76,9 @@ public class SoundMeterService extends Service {
 
         threshold = (int) (32767 - (double) AppSettings.getSensitivity() / 100 * 32767);
         Log.d(TAG, "threshold is now: "+threshold);
+
+        forgiveness = AppSettings.getForgiveness();
+        Log.d(TAG, "forgiveness is now: "+forgiveness);
 
         if (recorder == null) {
             recorder = new MediaRecorder();
