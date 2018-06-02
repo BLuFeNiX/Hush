@@ -4,12 +4,14 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -62,6 +64,7 @@ public class SoundMeterService extends Service {
                 timeout = true;
                 //hushCounter = 0;
                 Log.d(TAG, "TIMEOUT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                onTimeout();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -70,6 +73,7 @@ public class SoundMeterService extends Service {
                             handler.postDelayed(this, cooldown);
                         } else {
                             timeout = false;
+                            onCooldown();
                             Log.d(TAG, "Time out over! @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
                         }
                     }
@@ -80,6 +84,20 @@ public class SoundMeterService extends Service {
             handler.postDelayed(this, dutyCycle);
         }
     };
+
+
+    /**
+     * currently just for testing the detection algorithm, when in timeout, the phone will vibrate
+     */
+    private void onTimeout() {
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(new long[]{500, 500}, 0); // repeatedly vibrate until canceled
+    }
+
+    private void onCooldown() {
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        v.cancel();
+    }
 
     @Nullable
     @Override

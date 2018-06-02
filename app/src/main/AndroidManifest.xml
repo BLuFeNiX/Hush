@@ -2,6 +2,7 @@
     package="com.example.hush">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
         android:name=".HushApp"
