@@ -5,4 +5,6 @@
     <string name="cooldown">Cooldown Time</string>
     <string name="start_service">Start Service (save settings)</string>
     <string name="stop_service">Stop Service</string>
+    <string name="hush_popup_title">Hush!</string>
+    <string name="hush_message">You are being too loud!</string>
 </resources>

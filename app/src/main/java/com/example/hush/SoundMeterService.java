@@ -1,19 +1,19 @@
 package com.example.hush;
 
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.WindowManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,10 +24,11 @@ public class SoundMeterService extends Service {
     private static final String TAG = SoundMeterService.class.getSimpleName();
     private static final String NOTIFICATION_CHANNEL_ID_SERVICE = "my_notification_channel_id";
 
+    AlertDialog hushAlert;
+
     private MediaRecorder recorder = null;
 
     private RunningAverage avgAmp = new RunningAverage(6000);
-
 
     /**
      * how high the amplitude needs to be before we care
@@ -87,16 +88,29 @@ public class SoundMeterService extends Service {
 
 
     /**
-     * currently just for testing the detection algorithm, when in timeout, the phone will vibrate
+     * show an alert dialog that cannot be dismissed by the user
      */
     private void onTimeout() {
-        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(new long[]{500, 500}, 0); // repeatedly vibrate until canceled
+        hushAlert =  new AlertDialog.Builder(getApplicationContext(),
+                android.R.style.Theme_DeviceDefault_NoActionBar_Fullscreen)
+                .setCancelable(false)
+                .setView(R.layout.hush_popup)
+                .create();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            hushAlert.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+        } else {
+            hushAlert.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+        }
+
+        hushAlert.show();
     }
 
+    /**
+     * dismiss the alert dialog
+     */
     private void onCooldown() {
-        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        v.cancel();
+        if (hushAlert != null) hushAlert.dismiss();
     }
 
     @Nullable
@@ -154,8 +168,7 @@ public class SoundMeterService extends Service {
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .setContentTitle("Hush!")
                 .setContentText("Measuring microphone amplitude...")
-                .setSmallIcon(android.R.drawable.stat_sys_speakerphone)
-                .setTicker("what's a ticker?")
+                .setSmallIcon(android.R.drawable.ic_btn_speak_now)
                 .setAutoCancel(true)
                 .setVisibility(Notification.VISIBILITY_PUBLIC);
 
