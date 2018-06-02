@@ -49,6 +49,20 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        SeekBar cooldown = findViewById(R.id.seekbar_cooldown);
+        cooldown.setProgress(AppSettings.getCooldown());
+        cooldown.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                AppSettings.setCooldown(seekBar.getProgress());
+                Log.d(TAG, "cooldown changed: "+seekBar.getProgress());
+            }
+        });
+
         findViewById(R.id.button_start).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

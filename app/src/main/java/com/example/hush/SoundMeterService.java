@@ -34,6 +34,10 @@ public class SoundMeterService extends Service {
     int threshold = 0;
     int forgiveness = 0;
     int hushCounter = 0;
+    int cooldown = 0;
+    boolean timeout = false;
+
+    int dutyCycle = 100; // milliseconds
 
     HandlerThread handlerThread = new HandlerThread(SoundMeterService.class.getSimpleName()+"-Thread");
     Handler handler;
@@ -51,9 +55,29 @@ public class SoundMeterService extends Service {
                 if (hushCounter > 0) hushCounter--;
             }
 
-            Log.d(TAG, "avg: "+avg + ", amp: "+amp + ", diff: "+(amp-avg) + " too loud? " + (hushCounter > forgiveness));
+            Log.d(TAG, "avg: "+avg + ", amp: "+amp + ", diff: "+adjustedAmp);
 
-            handler.postDelayed(this, 100);
+            // if too loud for too long ...
+            if (!timeout && hushCounter > forgiveness) {
+                timeout = true;
+                //hushCounter = 0;
+                Log.d(TAG, "TIMEOUT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (hushCounter > forgiveness) {
+                            Log.d(TAG, "Still in timeout !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                            handler.postDelayed(this, cooldown);
+                        } else {
+                            timeout = false;
+                            Log.d(TAG, "Time out over! @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                        }
+                    }
+                }, cooldown);
+            }
+
+
+            handler.postDelayed(this, dutyCycle);
         }
     };
 
@@ -79,6 +103,9 @@ public class SoundMeterService extends Service {
 
         forgiveness = AppSettings.getForgiveness();
         Log.d(TAG, "forgiveness is now: "+forgiveness);
+
+        cooldown = AppSettings.getCooldown() * 1000;
+        Log.d(TAG, "cooldown is now: "+cooldown);
 
         if (recorder == null) {
             recorder = new MediaRecorder();

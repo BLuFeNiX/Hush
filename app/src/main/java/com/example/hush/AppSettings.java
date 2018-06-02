@@ -13,6 +13,7 @@ class AppSettings {
     private static final String PREF_NAME = "app_settings";
     private static final String KEY_SENSITIVITY = "sensitivity";
     private static final String KEY_FORGIVENESS = "forgiveness";
+    private static final String KEY_COOLDOWN = "cooldown";
 
     /**
      * Set desired microphone amplitude response trigger sensitivity.
@@ -46,6 +47,21 @@ class AppSettings {
 
     public static int getForgiveness() {
         return getSettings().getInt(KEY_FORGIVENESS, 20);
+    }
+
+    /**
+     * How long must the user be quiet before we stop caring that they were loud?
+     *
+     * Should be controlled by {@link SettingsActivity}.
+     *
+     * @param cooldown int from 0 to 100 (inclusive)
+     */
+    public static void setCooldown(int cooldown) {
+        getSettings().edit().putInt(KEY_COOLDOWN, cooldown).apply();
+    }
+
+    public static int getCooldown() {
+        return getSettings().getInt(KEY_COOLDOWN, 10);
     }
 
     private static SharedPreferences getSettings() {
