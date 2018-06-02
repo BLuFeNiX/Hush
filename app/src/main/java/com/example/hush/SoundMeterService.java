@@ -31,12 +31,25 @@ public class SoundMeterService extends Service {
     Runnable soundCheck = new Runnable() {
         @Override
         public void run() {
-            int amp = recorder.getMaxAmplitude();
+            int amp = recorder.getMaxAmplitude(); // highest possible value is 32767
             int avg = avgAmp.add(amp);
+            int adjustedAmp = amp-avg;
+
             Log.d(TAG, "avg: "+avg + ", amp: "+amp + ", diff: "+(amp-avg));
+
+            if (adjustedAmp >= threshold) {
+                Log.d(TAG, "Hush!");
+            }
+
             handler.postDelayed(this, 100);
         }
     };
+
+    /**
+     * how high the amplitude needs to be before we care
+     * should be from 0 to 32767
+     */
+    int threshold = 0;
 
     @Nullable
     @Override
@@ -54,6 +67,9 @@ public class SoundMeterService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         Log.d(TAG, "onStartCommand!!!");
+
+        threshold = (int) (32767 - (double) AppSettings.getSensitivity() / 100 * 32767);
+        Log.d(TAG, "threshold is now: "+threshold);
 
         if (recorder == null) {
             recorder = new MediaRecorder();
