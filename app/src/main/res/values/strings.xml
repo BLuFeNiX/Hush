@@ -3,5 +3,6 @@
     <string name="sensitivity">Sensitivity</string>
     <string name="forgiveness">Forgiveness</string>
     <string name="cooldown">Cooldown Time</string>
-    <string name="start_service">Start Service</string>
+    <string name="start_service">Start Service (save settings)</string>
+    <string name="stop_service">Stop Service</string>
 </resources>

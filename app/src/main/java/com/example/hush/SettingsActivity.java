@@ -69,6 +69,13 @@ public class SettingsActivity extends AppCompatActivity {
                 tryToStartService();
             }
         });
+
+        findViewById(R.id.button_stop).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopService(new Intent(SettingsActivity.this, SoundMeterService.class));
+            }
+        });
     }
 
     private void tryToStartService() {
@@ -76,7 +83,6 @@ public class SettingsActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 0);
         } else {
             startService(new Intent(this, SoundMeterService.class));
-            finish();
         }
     }
 
@@ -84,7 +90,6 @@ public class SettingsActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startService(new Intent(this, SoundMeterService.class));
-            finish();
         }
     }
 }

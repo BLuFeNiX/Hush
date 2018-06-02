@@ -173,6 +173,8 @@ public class SoundMeterService extends Service {
 
         Log.d(TAG, "onDestroy!!!");
 
+        onCooldown();
+
         if (recorder != null) {
             recorder.stop();
             recorder.release();
